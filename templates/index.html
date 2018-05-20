@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QYTool</title>
+    <!-- 载入easyUI-->
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/jquery.easyui.mobile.js"></script>
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="../static/jquery-easyui-1.5.5/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="../static/jquery-easyui-1.5.5/themes/icon.css">
+    <link rel="stylesheet" type="text/css"
+          href="../static/jquery-easyui-1.5.5/themes/mobile.css">
+    <script type="text/javascript">
+        var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+    </script>
+</head>
+<body>
+<div class="easyui-navpanel" style="position:relative;padding:20px">
+    <header>
+        <div class="m-toolbar">
+            <div class="m-title">TODO Input</div>
+            <div class="m-left">
+                <a href="javascript:void(0)" class="easyui-linkbutton m-back" plain="true" outline="true"
+                   onclick="$.mobile.back()">Back</a>
+            </div>
+        </div>
+    </header>
+    <form id="todoff">
+        <div style="margin-bottom:10px">
+            <input id="title" class="easyui-textbox" label="标题:" prompt="标题" style="width:100%" required/>
+        </div>
+        <div style="margin-bottom:10px">
+            <input id="content" class="easyui-textbox" data-options="multiline:true" label="内容：" prompt="请输入内容"
+                   style="width:100%" required>
+        </div>
+        <div style="margin-bottom:10px">
+            <label class="textbox-label">权限 ：</label><input class="easyui-switchbutton"
+                                                            data-options="onText:'凭密可见',offText:'对外公开'" checked
+                                                            style="width: 30%">
+        </div>
+        <div style="margin-bottom:10px">
+            <label class="textbox-label">期限 ：</label><input class="easyui-datebox" prompt="请输入预定期限">
+        </div>
+        <div style="margin-bottom:10px">
+            <label class="textbox-label"></label><input class="easyui-datebox" prompt="请输入必须期限">
+        </div>
+        <div style="margin-bottom:10px">
+            <label class="textbox-label">完了 ：</label><input class="easyui-switchbutton"
+                                                            data-options="onText:'完了',offText:'继续中'" style="width: 30%">
+        </div>
+        <div style="margin-bottom:10px">
+            <label class="textbox-label">创建日</label><input id="creatday" class="easyui-datebox" prompt="请输入必须期限"
+                                                           data-options="editable:false">
+        </div>
+    </form>
+    <footer>
+        <div class="m-toolbar">
+            <div class="m-right">
+                <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true"
+                   onclick="$('#ff').form('reset')" style="width:60px">新建</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true"
+                   onclick="$('#ff').form('reset')" style="width:60px">更新</a>
+            </div>
+        </div>
+    </footer>
+</div>
+<script>
+    $.extend($.fn.textbox.methods, {
+        addClearBtn: function (jq, iconCls) {
+            return jq.each(function () {
+                var t = $(this);
+                var opts = t.textbox('options');
+                opts.icons = opts.icons || [];
+                if (opts.icons.length == 0) {
+                    opts.icons.unshift({
+                        iconCls: iconCls,
+                        handler: function (e) {
+                            $(e.data.target).textbox('clear').textbox('textbox').focus();
+                            $(this).css('visibility', 'hidden');
+                        }
+                    })
+                }
+                ;
+                t.textbox();
+                if (!t.textbox('getText')) {
+                    t.textbox('getIcon', 0).css('visibility', 'hidden');
+                }
+                t.textbox('textbox').bind('keyup', function () {
+                    var icon = t.textbox('getIcon', 0);
+                    if ($(this).val()) {
+                        icon.css('visibility', 'visible');
+                    } else {
+                        icon.css('visibility', 'hidden');
+                    }
+                });
+            });
+        }
+    });
+
+    $(function () {
+        //带清除标记文本框
+        $('#title').textbox().textbox('addClearBtn', 'icon-clear');
+        $('#content').textbox().textbox('addClearBtn', 'icon-clear');
+        //自动附上今天日期
+        var curr_time = new Date();
+        var strDate = curr_time.getFullYear() + "-";
+        strDate += curr_time.getMonth() + 1 + "-";
+        strDate += curr_time.getDate() + "-";
+        strDate += curr_time.getHours() + ":";
+        strDate += curr_time.getMinutes() + ":";
+        strDate += curr_time.getSeconds();
+        $("#creatday").datebox("setValue", strDate);
+    });
+</script>
+</body>
+</html>
