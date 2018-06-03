@@ -5,22 +5,14 @@
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QYTool</title>
     <!-- 载入easyUI-->
-    <script type="text/javascript"
-            src="../static/jquery-easyui-1.5.5/jquery.min.js"></script>
-    <script type="text/javascript"
-            src="../static/jquery-easyui-1.5.5/jquery.easyui.mobile.js"></script>
-    <script type="text/javascript"
-            src="../static/jquery-easyui-1.5.5/jquery.easyui.min.js"></script>
-    <script type="text/javascript"
-            src="../static/jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js"></script>
-    <link rel="stylesheet" type="text/css"
-          href="../static/jquery-easyui-1.5.5/themes/bootstrap/easyui.css">
-    <link rel="stylesheet" type="text/css"
-          href="../static/jquery-easyui-1.5.5/themes/icon.css">
-    <link rel="stylesheet" type="text/css"
-          href="../static/jquery-easyui-1.5.5/themes/mobile.css">
-    <link rel="stylesheet" type="text/css"
-          href="../static/jquery-easyui-1.5.5/themes/mycss.css">
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.mobile.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/bootstrap/easyui.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/icon.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mobile.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mycss.css')}}">
     <script type="text/javascript">
         var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
     </script>
@@ -31,42 +23,53 @@
     </style>
 </head>
 <body>
-
+ {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+{% if error %}
+    {% for errorcontent in error %}
+        <p class="error"><strong>Error:</strong> {{ errorcontent }}
+    {% endfor %}
+{% endif %}
+<form id="testform" action="{{ url_for('sw2changed') }} " method="post">
 <div class="easyui-navpanel">
     <header>
         <div class="m-toolbar">
             <span class="m-title">TODO_List</span>
-            <span class="m-right"><a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true"
+            <span class="m-right"><a href="{{ url_for('sw2changed') }}" class="easyui-linkbutton" plain="true" outline="true"
                                      onclick="">新建</a></span>
         </div>
     </header>
-    <div class="easyui-accordion" fit="false" border="true" data-options="multiple:true,selected:2">
+    <div id="accordion1" class="easyui-accordion" fit="false" border="true" data-options="multiple:true">
         <div title="超过期限">
             <ul class="m-list">
-                <li>test</li>
-                <li>test</li>
             </ul>
         </div>
-        <div title="今日预定">
-            <ul class="m-list">
-                <li>test</li>
-                <li>test</li>
-            </ul>
-        </div>
-        <div title="指定日期或状态查看">
-            <input id="startday" class="easyui-datebox" prompt="请输入开始日" data-options="editable:false" style="width: 35%"> - <input id="endday" class="easyui-datebox" prompt="请输入结束日" data-options="editable:false" style="width: 35%">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="sw1" class="easyui-switchbutton " data-options="onText:'完了',offText:'继续中'" style="width: 20%;">
-            <br>
-            <div style="text-align: right"><a href="javascript:void(0)" class="easyui-linkbutton" plain="true"
-                                              outline="true" onclick="">查询</a></div>
 
+        <div title="指定日期或状态查看" id="searcheara">
+
+           <input id="startday" name="startday_name" class="easyui-datebox" prompt="请输入开始日" data-options="editable:false" style="width: 35%" value="{{ request.form['startday_name'] }}"> - <input id="endday" name="endday_name" class="easyui-datebox" prompt="请输入结束日" data-options="editable:false" style="width: 35%" value="{{ request.form['endday_name'] }}">
+            {% if statechecked == "false" %}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 20%;" >
+            {% elif  statechecked == "true"  %}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 20%;" checked=true>
+            {% endif %}
+            <br>
+            <div style="text-align: right"><a id="linksubmitd" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true">查询</a></div>
+            <input type="hidden" name="sw1_name_hidden" id="sw1_hidden" value="{{ sw1_name_hidden_value }}">
         </div>
+
     </div>
 </div>
 <div class="easyui-navpanel">
     <div style="text-align: right">
-      <input id="sw2" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 10%">
+        {% if statechecked2 == "false" %}
+            <input id="sw2" name="sw2_name" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 20%">
+        {% elif  statechecked2 == "true"  %}
+            <input id="sw2" name="sw2_name" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 20%" checked>
+        {% endif %}
     </div>
+    <input type="hidden" name="sw2_name_hidden" id="sw2_hidden" value="{{ sw2_name_hidden_value }}" >
     <div id="dl" data-options="
 				fit: false,
 				border: true,
@@ -74,6 +77,7 @@
 				">
     </div>
 </div>
+</form>
 <script>
     /*
     var data = [
@@ -85,30 +89,109 @@
     */
 
     $(function () {
-         $.getJSON($SCRIPT_ROOT + '/_get_todo',function(data) {
-             $('#dl').datalist({
-                data: data.result,
-                textField: 'item',
-                groupField: 'group',
-                textFormatter: function (value) {
-                return '<a href="javascript:void(0)" class="datalist-link">' + value + '</a>';
-                },
-                groupFormatter: function (value, rows) {
-                // var s = rows.css.backgroundColor.valueOf();s..val("#00CED1")
-                return "<span style='color:red'>" + value + "<span>"
-                //return "background-color:green"
-                },
-                onClickRow: function (index, row) {
-
-                //$.mobile.go('#p2');
+        //显示一栏
+        if ($('p.error').get(0) == null) {
+            $.getJSON($SCRIPT_ROOT + '/_get_todo', {
+                startday: $('#startday').val(),
+                endday: $('#endday').val(),
+                sw1_setvalue: $('#sw1').switchbutton("options").checked,
+                sw2_setvalue: $('#sw2').switchbutton("options").checked
+            }, function (data) {
+                var viewdata;
+                if (data.result.length == 0) {
+                    viewdata = [{"group": "", "item": "无检索结果"}];
+                } else {
+                    viewdata = data.result;
                 }
+                $('#dl').datalist({
+                    data: viewdata,
+                    textField: 'item',
+                    groupField: 'group',
+                    textFormatter: function (value) {
+                        return '<a href="javascript:void(0)" class="datalist-link">' + value + '</a>';
+                    },
+                    groupFormatter: function (value, rows) {
+                        // var s = rows.css.backgroundColor.valueOf();s..val("#00CED1")
+                        return "<span style='color:red'>" + value + "<span>"
+                        //return "background-color:green"
+                    },
+                    onClickRow: function (index, row) {
+
+                        //$.mobile.go('#p2');
+                    }
+                });
             });
+        }else {
+            var viewdata = [{"group": "", "item": "无检索结果"}];
+            $('#dl').datalist({
+                data: viewdata,
+                textField: 'item',
+                groupField: 'group'
+                    //textFormatter: function (value) {
+                        //return '<a href="" class="datalist-link">' + value + '</a>';
+                   // },
+                    //groupFormatter: function (value, rows) {
+                        // var s = rows.css.backgroundColor.valueOf();s..val("#00CED1")
+                        //return "<span style='color:red'>" + value + "<span>"
+                        //return "background-color:green"
+                    //},
+                    //onClickRow: function (index, row) {
+
+                        //$.mobile.go('#p2');
+                    //}
+                });
+        }
+         //显示超过期限的数据
+
+        $.getJSON($SCRIPT_ROOT + '/_get_timeup_todo',{sw1_setvalue:$('#sw1').switchbutton("options").checked,sw2_setvalue:$('#sw2').switchbutton("options").checked},function(data) {
+                $.each(data, function(i) {
+                    //console.log(data[i])
+                    var data1 = data[i]
+                    if (data1.length == 0) {
+                         $("<li>真棒！全完成了！</li>").appendTo(".m-list");
+                    } else{
+                        for (var j=0;j<data1.length;j++)
+                    {
+                        //console.log(data1[j]['title'])
+                        $("<li>"+data1[j]['title']+"</li>").appendTo(".m-list");
+                    }
+                    }
+                  })
+        });
+        //默认选中公开
+        $('#sw2').switchbutton({
+            onChange: function(checked){
+                 if (checked == true){
+                     $("#sw2_hidden").val("True")
+                 }else if (checked == false) {
+                     $("#sw2_hidden").val("False")
+                 }
+                $("#testform").submit();
+           }
+        })
+        //默认选中继续中；并随值的改变把值存入hidden中
+         $('#sw1').switchbutton({
+             onChange: function (checked) {
+                 if (checked == true){
+                     $("#sw1_hidden").attr("value","True");
+                 }else if (checked == false) {
+                     $("#sw1_hidden").attr("value","False");
+                 }
+             }
+        })
+
+        $('#linksubmitd').bind('click', function(){
+          $("#testform").submit()
         });
 
-        $("#sw2").unchecked = true;
-        $(".easyui-accordion .panel-header").click();
-
+        //有错误的时候打开输入面板展现错误
+        if ($('p.error').get(0) != null) {
+            $('#accordion1').accordion("select","指定日期或状态查看");
+        };
     })
+
+
 </script>
+
 </body>
 </html>

@@ -5,16 +5,44 @@
     <title>QYTool</title>
     <!-- 载入easyUI-->
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.mobile.js')}}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.min.js')}}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js')}}"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/bootstrap/easyui.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/icon.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/demo/demo.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mobile.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mycss.css')}}">
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/jquery.easyui.mobile.js"></script>
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="../static/jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="../static/jquery-easyui-1.5.5/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="../static/jquery-easyui-1.5.5/themes/icon.css">
+    <link rel="stylesheet" type="text/css"
+          href="../static/jquery-easyui-1.5.5/themes/mobile.css">
+    <link rel="stylesheet" type="text/css"
+          href="../static/jquery-easyui-1.5.5/themes/mycss.css">
     <script type="text/javascript">
         var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
     </script>
 </head>
 <body>
-
+<div class="easyui-navpanel">
+    <div style="text-align: right">
+      <input id="sw2" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 10%">
+    </div>
+    <div id="dl" data-options="
+				fit: false,
+				border: true,
+				lines: true
+				">
+    </div>
+</div>
 </body>
 </html>
