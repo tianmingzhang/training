@@ -32,11 +32,12 @@
     {% endfor %}
 {% endif %}
 <form id="testform" action="{{ url_for('sw2changed') }} " method="post">
+<input type="hidden"  id="from_index_return_list" value="{{ from_index_return_list_value }}">
 <div class="easyui-navpanel">
     <header>
         <div class="m-toolbar">
             <span class="m-title">TODO_List</span>
-            <span class="m-right"><a href="{{ url_for('sw2changed') }}" class="easyui-linkbutton" plain="true" outline="true"
+            <span class="m-right"><a href="{{ url_for('detail_display',item='') }}" class="easyui-linkbutton" plain="true" outline="true"
                                      onclick="">新建</a></span>
         </div>
     </header>
@@ -48,12 +49,13 @@
 
         <div title="指定日期或状态查看" id="searcheara">
 
-           <input id="startday" name="startday_name" class="easyui-datebox" prompt="请输入开始日" data-options="editable:false" style="width: 35%" value="{{ request.form['startday_name'] }}"> - <input id="endday" name="endday_name" class="easyui-datebox" prompt="请输入结束日" data-options="editable:false" style="width: 35%" value="{{ request.form['endday_name'] }}">
+           <input id="startday" name="startday_name" class="easyui-datebox" prompt="请输入开始日" data-options="editable:false" style="width: 35%" value="{{ '%s'% request.form['startday_name'] if "startday_name" in request.form else session['startday_Session']}}"> - <input id="endday" name="endday_name" class="easyui-datebox" prompt="请输入结束日" data-options="editable:false,validType:'equaldDate[\'#startday\']'" style="width: 35%" value="{{ '%s'% request.form['endday_name'] if "endday_name" in request.form else session['endday_Session'] }}">
             {% if statechecked == "false" %}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 20%;" >
             {% elif  statechecked == "true"  %}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 20%;" checked=true>
             {% endif %}
+            <input id="titleinput" class="easyui-textbox" name="titleinput_name"  prompt="请输入标题" style="width:60%"  value="{{ '%s'% request.form['titleinput_name'] if "titleinput_name" in request.form else session['titleinput_name_session']}}"/>
             <br>
             <div style="text-align: right"><a id="linksubmitd" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true">查询</a></div>
             <input type="hidden" name="sw1_name_hidden" id="sw1_hidden" value="{{ sw1_name_hidden_value }}">
@@ -89,13 +91,25 @@
     */
 
     $(function () {
+        var sw1_setvalue = $('#sw1').switchbutton("options").checked;
+        var sw2_setvalue = $('#sw2').switchbutton("options").checked;
+        //console.log("{{ session['startday_Session'] }}")
+        if ($("#from_index_return_list").attr("value")=="true") {
+             $('#startday').val("{{ session['startday_Session'] }}");
+             //console.log($('#startday').attr("value"))
+             $('#endday').val("{{ session['endday_Session'] }}");
+             $('#titleinput').val("{{ session['titleinput_name_session'] }}");
+             sw1_setvalue = "{{ session['sw1_Session'] }}";
+             sw2_setvalue = "{{ session['sw2_Session'] }}";
+        }
         //显示一栏
         if ($('p.error').get(0) == null) {
             $.getJSON($SCRIPT_ROOT + '/_get_todo', {
                 startday: $('#startday').val(),
                 endday: $('#endday').val(),
-                sw1_setvalue: $('#sw1').switchbutton("options").checked,
-                sw2_setvalue: $('#sw2').switchbutton("options").checked
+                sw1_setvalue: sw1_setvalue,
+                sw2_setvalue: sw2_setvalue,
+                title:$('#titleinput').val()
             }, function (data) {
                 var viewdata;
                 if (data.result.length == 0) {
@@ -105,10 +119,15 @@
                 }
                 $('#dl').datalist({
                     data: viewdata,
+                    valueField:'valueid',
                     textField: 'item',
                     groupField: 'group',
                     textFormatter: function (value) {
-                        return '<a href="javascript:void(0)" class="datalist-link">' + value + '</a>';
+                        if (data.result.length != 0) {
+                            return '<a href="javascript:void(0)" class="datalist-link">' + value + '</a>';
+                        } else {
+                            return '<p>' + value + '</p>';
+                        }
                     },
                     groupFormatter: function (value, rows) {
                         // var s = rows.css.backgroundColor.valueOf();s..val("#00CED1")
@@ -116,7 +135,11 @@
                         //return "background-color:green"
                     },
                     onClickRow: function (index, row) {
-
+                         if (data.result.length != 0) {
+                             var action_f = sprintf("{{ url_for('detail_display',item = '{0}')}}", row.valueid);
+                             $("#testform").attr("action", action_f);
+                             $("#testform").submit();
+                         }
                         //$.mobile.go('#p2');
                     }
                 });
@@ -127,23 +150,11 @@
                 data: viewdata,
                 textField: 'item',
                 groupField: 'group'
-                    //textFormatter: function (value) {
-                        //return '<a href="" class="datalist-link">' + value + '</a>';
-                   // },
-                    //groupFormatter: function (value, rows) {
-                        // var s = rows.css.backgroundColor.valueOf();s..val("#00CED1")
-                        //return "<span style='color:red'>" + value + "<span>"
-                        //return "background-color:green"
-                    //},
-                    //onClickRow: function (index, row) {
-
-                        //$.mobile.go('#p2');
-                    //}
                 });
         }
          //显示超过期限的数据
 
-        $.getJSON($SCRIPT_ROOT + '/_get_timeup_todo',{sw1_setvalue:$('#sw1').switchbutton("options").checked,sw2_setvalue:$('#sw2').switchbutton("options").checked},function(data) {
+        $.getJSON($SCRIPT_ROOT + '/_get_timeup_todo',{sw1_setvalue:sw1_setvalue,sw2_setvalue:sw2_setvalue},function(data) {
                 $.each(data, function(i) {
                     //console.log(data[i])
                     var data1 = data[i]
@@ -153,7 +164,8 @@
                         for (var j=0;j<data1.length;j++)
                     {
                         //console.log(data1[j]['title'])
-                        $("<li>"+data1[j]['title']+"</li>").appendTo(".m-list");
+                        var link_f = sprintf("{{ url_for('detail_display',item = '{0}')}}", data1[j]['value_id']);
+                        $("<li><a href='"+ link_f +"'>"+data1[j]['title']+"</a></li>").appendTo(".m-list");
                     }
                     }
                   })
@@ -185,12 +197,32 @@
         });
 
         //有错误的时候打开输入面板展现错误
-        if ($('p.error').get(0) != null) {
+        if ($('p.error').get(0) != null || $('startday').val() != undefined || $('endday').val() != undefined || $('#sw1').switchbutton("options").checked == true) {
             $('#accordion1').accordion("select","指定日期或状态查看");
         };
     })
 
-
+    $.extend($.fn.validatebox.defaults.rules, {
+        equaldDate: {
+           validator: function(value, param){
+               if(value != '')  {
+                    var d1 = $(param[0]).datetimebox('getValue');  //获取开始时间
+                    return value >=d1;  //有效范围为大于开始时间的日期
+               }
+            },
+           message: '开始日期不能晚于结束日期(不含当日)!'
+        }
+    });
+sprintf = function() {
+   var num = arguments.length;
+   var oStr = arguments[0];
+   for (var i = 1; i < num; i++) {
+     var pattern = "\\{" + (i-1) + "\\}";
+     var re = new RegExp(pattern, "g");
+     oStr = decodeURI(oStr).replace(re, arguments[i]);
+   }
+   return encodeURI(oStr);
+ }
 </script>
 
 </body>

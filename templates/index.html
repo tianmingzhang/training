@@ -6,9 +6,9 @@
     <title>QYTool</title>
     <!-- 载入easyUI-->
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.mobile.js')}}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.min.js')}}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js')}}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.mobile.js')}}"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/bootstrap/easyui.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/icon.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mobile.css')}}">
@@ -18,51 +18,71 @@
     </script>
 </head>
 <body>
+ {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+{% if error %}
+    {% for errorcontent in error %}
+        <p class="error"><strong>Error:</strong> {{ errorcontent }}
+    {% endfor %}
+{% endif %}
 <div class="easyui-navpanel" style="position:relative;padding:20px">
     <header>
         <div class="m-toolbar">
             <div class="m-title">TODO Input</div>
             <div class="m-left">
-                <a href="javascript:void(0)" class="easyui-linkbutton m-back" plain="true" outline="true"
-                   onclick="$.mobile.back()">Back</a>
+                <a href="{{ url_for('back_list') }}"class="easyui-linkbutton m-back" plain="true" outline="true">Back</a>
             </div>
         </div>
     </header>
-    <form id="todoff">
+    <form id="todoff" action="{{ url_for('content_update') }} " method="post">
         <div style="margin-bottom:10px">
-            <input id="title" class="easyui-textbox" label="标题:" prompt="标题" style="width:100%" required/>
+            <input id="title" class="easyui-textbox" name="title_index" label="标题:" prompt="标题" style="width:100%"  value="{{ '%s'% request.form['title_index'] if "title_index" in request.form else session['title_index']}}" required/>
         </div>
         <div style="margin-bottom:10px">
-            <input id="content" class="easyui-textbox" data-options="multiline:true" label="内容：" prompt="请输入内容"
+            <input id="content" class="easyui-textbox" name="content_index" data-options="multiline:true" label="内容：" prompt="请输入内容" value="{{ '%s'% request.form['content_index'] if "content_index" in request.form else session['content_index']}}"
                    style="width:100%" required>
         </div>
         <div style="margin-bottom:10px">
-            <label class="textbox-label">权限 ：</label><input class="easyui-switchbutton"
-                                                            data-options="onText:'凭密可见',offText:'对外公开'" checked
-                                                            style="width: 30%">
+        <label class="textbox-label">权限 ：</label>
+            {% if authchecked == "false" %}
+                <input id="sw3" class="easyui-switchbutton"  data-options="onText:'凭密可见',offText:'对外公开'" style="width: 30%">
+            {% elif  authchecked == "true"  %}
+                <input id="sw3" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 30%" checked>
+            {% endif %}
+        </div>
+        <input type="hidden" name="sw3_name_hidden" id="sw3_hidden" value="{{ sw3_name_hidden_value }}" >
+        <div style="margin-bottom:10px">
+            <label class="textbox-label">预定期限：</label><input id="scheduleday" name="scheduleday_name" class="easyui-datebox" prompt="请输入预定期限"  data-options="selectOnNavigation:false,novalidate:true" value="{{ '%s'% request.form['scheduleday_name'] if "scheduleday_name" in request.form else session['scheduleday_name']  }}">
         </div>
         <div style="margin-bottom:10px">
-            <label class="textbox-label">期限 ：</label><input class="easyui-datebox" prompt="请输入预定期限">
+            <label class="textbox-label">必须期限：</label><input id="mustday" class="easyui-datebox" name="mustday_name" prompt="请输入必须期限" value="{{ '%s'% request.form['mustday_name'] if "mustday_name" in request.form else session['mustday_name']  }}">
         </div>
         <div style="margin-bottom:10px">
-            <label class="textbox-label"></label><input class="easyui-datebox" prompt="请输入必须期限">
+            <label class="textbox-label">完了 ：</label>
+            {% if finishchecked == "false" %}
+                <input id="sw4" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 30%">
+            {% elif  finishchecked == "true"  %}
+                <input id="sw4" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 30%" checked>
+            {% endif %}
         </div>
+        <input type="hidden" name="sw4_name_hidden" id="sw4_hidden" value="{{ sw4_name_hidden_value }}" >
         <div style="margin-bottom:10px">
-            <label class="textbox-label">完了 ：</label><input class="easyui-switchbutton"
-                                                            data-options="onText:'完了',offText:'继续中'" style="width: 30%">
+            <label class="textbox-label">创建日</label><input id="creatday" name="create_date_index" class="easyui-datebox" data-options="editable:false" value="{{ '%s'% request.form['create_date_index'] if "create_date_index" in request.form else session['create_date_index']  }}">
         </div>
-        <div style="margin-bottom:10px">
-            <label class="textbox-label">创建日</label><input id="creatday" class="easyui-datebox" prompt="请输入必须期限"
-                                                           data-options="editable:false">
-        </div>
+    <input type="hidden" name="buttonflag_name" id="buttonflag" value="{{ buttonflag }}" >
+    <input type="hidden" name="item_id_name" id="item_id" value="{{ item_id }}" >
     </form>
     <footer>
         <div class="m-toolbar">
             <div class="m-right">
+                {% if buttonflag == "false" %}
                 <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true"
-                   onclick="$('#ff').form('reset')" style="width:60px">新建</a>
+                   onclick="$('#todoff').submit()" style="width:60px">新建</a>
+                {% elif  buttonflag == "true"  %}
                 <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true"
-                   onclick="$('#ff').form('reset')" style="width:60px">更新</a>
+                   onclick="$('#todoff').submit()" style="width:60px">更新</a>
+                {% endif %}
             </div>
         </div>
     </footer>
@@ -100,19 +120,68 @@
         }
     });
 
+    $.fn.datebox.defaults.parser  = function(s){
+            if (!s) {
+                return new Date();
+            }
+            var ss = s.split("-");
+            var y = parseInt(ss[0], 10);
+            var m = parseInt(ss[1], 10);
+            var d = parseInt(ss[2], 10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+                return new Date(y, m - 1, d);
+            } else {
+                return new Date();
+            }
+    };
+
+    $.fn.datebox.methods.initValue  = function(jq, _bfc) {
+       //jq.preventDefault();
+    }
     $(function () {
-        //带清除标记文本框
+        //标题，内容-带清除标记文本框
         $('#title').textbox().textbox('addClearBtn', 'icon-clear');
         $('#content').textbox().textbox('addClearBtn', 'icon-clear');
-        //自动附上今天日期
-        var curr_time = new Date();
-        var strDate = curr_time.getFullYear() + "-";
-        strDate += curr_time.getMonth() + 1 + "-";
-        strDate += curr_time.getDate() + "-";
-        strDate += curr_time.getHours() + ":";
-        strDate += curr_time.getMinutes() + ":";
-        strDate += curr_time.getSeconds();
-        $("#creatday").datebox("setValue", strDate);
+        //创建日-自动附上今天日期
+        if ($('#creatday').attr('value') == '') {
+            var curr_time = new Date();
+            var strDate = curr_time.getFullYear() + "-";
+            strDate += curr_time.getMonth() + 1 + "-";
+            strDate += curr_time.getDate() + "-";
+            strDate += curr_time.getHours() + ":";
+            strDate += curr_time.getMinutes() + ":";
+            strDate += curr_time.getSeconds();
+            $("#creatday").datebox("setValue", strDate);
+        }
+        //预定期限设值
+        //$('#scheduleday').datebox('setValue', "{{ request.form['scheduleday_name']}}");
+
+
+        //随值的改变把值存入hidden中
+        $('#sw3').switchbutton({
+            onChange: function(checked){
+                 if (checked == true){
+                     $("#sw3_hidden").val("True")
+                 }else if (checked == false) {
+                     $("#sw3_hidden").val("False")
+                 }
+           }
+        })
+        //随值的改变把值存入hidden中
+         $('#sw4').switchbutton({
+             onChange: function (checked) {
+                 if (checked == true){
+                     $("#sw4_hidden").attr("value","True");
+                 }else if (checked == false) {
+                     $("#sw4_hidden").attr("value","False");
+                 }
+             }
+        })
+
+        //$('#scheduleday').datebox({focus:function(event) {
+            //console.log("active!")
+            //event.preventDefault();
+        //}});
     });
 </script>
 </body>
