@@ -5,16 +5,16 @@
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QYTool</title>
     <!-- 载入easyUI-->
-    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.min.js')}}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.mobile.js')}}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/jquery.easyui.min.js')}}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js')}}"></script>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/bootstrap/easyui.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/icon.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mobile.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mycss.css')}}">
+    <script type="text/javascript" src="{{ url_for('.static',filename='jquery-easyui-1.5.5/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('.static',filename='jquery-easyui-1.5.5/jquery.easyui.mobile.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('.static',filename='jquery-easyui-1.5.5/jquery.easyui.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('.static',filename='jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('.static',filename='jquery-easyui-1.5.5/themes/bootstrap/easyui.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('.static',filename='jquery-easyui-1.5.5/themes/icon.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('.static',filename='jquery-easyui-1.5.5/themes/mobile.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('.static',filename='jquery-easyui-1.5.5/themes/mycss.css')}}">
     <script type="text/javascript">
-         $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+        var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
     </script>
     <style type="text/css">
         .datalist {
@@ -81,6 +81,14 @@
 </div>
 </form>
 <script>
+    /*
+    var data = [
+        {"group": "FL-DSH-01", "item": "Tailless"},
+        {"group": "FL-DSH-02", "item": "Adult Female"},
+        {"group": "FL-DSH-02", "item": "Adult Male"},
+        {"group": "FL-DSH-01", "item": "With tail"}
+    ];
+    */
 
     $(function () {
         var sw1_setvalue = $('#sw1').switchbutton("options").checked;
@@ -96,7 +104,7 @@
         }
         //显示一栏
         if ($('p.error').get(0) == null) {
-            $.getJSON($SCRIPT_ROOT + '/todo/_get_todo', {
+            $.getJSON($SCRIPT_ROOT + '/_get_todo', {
                 startday: $('#startday').val(),
                 endday: $('#endday').val(),
                 sw1_setvalue: sw1_setvalue,
@@ -146,7 +154,7 @@
         }
          //显示超过期限的数据
 
-        $.getJSON($SCRIPT_ROOT + '/todo/_get_timeup_todo',{sw1_setvalue:sw1_setvalue,sw2_setvalue:sw2_setvalue},function(data) {
+        $.getJSON($SCRIPT_ROOT + '/_get_timeup_todo',{sw1_setvalue:sw1_setvalue,sw2_setvalue:sw2_setvalue},function(data) {
                 $.each(data, function(i) {
                     //console.log(data[i])
                     var data1 = data[i]
@@ -205,19 +213,16 @@
            message: '开始日期不能晚于结束日期(不含当日)!'
         }
     });
-    //对URL里的参数进行替换
-   sprintf = function() {
-       var num = arguments.length;
-       var oStr = arguments[0];
-       for (var i = 1; i < num; i++) {
-            var pattern = "\\{" + (i-1) + "\\}";
-            //全局匹配查找
-            var re = new RegExp(pattern, "g");
-            //在URL里用后面的值替换{i}
-            oStr = decodeURI(oStr).replace(re, arguments[i]);
-        }
-       return encodeURI(oStr);
-    }
+sprintf = function() {
+   var num = arguments.length;
+   var oStr = arguments[0];
+   for (var i = 1; i < num; i++) {
+     var pattern = "\\{" + (i-1) + "\\}";
+     var re = new RegExp(pattern, "g");
+     oStr = decodeURI(oStr).replace(re, arguments[i]);
+   }
+   return encodeURI(oStr);
+ }
 </script>
 
 </body>

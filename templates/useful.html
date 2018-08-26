@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+      //文件下载查看
+/*
+    $("#attach").on("click","li>a[id^='download_']",function(){
+        var fileid2 = $(this).next().val();
+        var action_f = '{{ url_for('todo.download_file',fileid='fileid1') }}'.replace('fileid1',fileid2);
+        //var form = $(this).closest('form');
+        //form.attr('action',action_f).trigger('submit');
+         $.get($SCRIPT_ROOT + '/todo/_download_file', {fileid: fileid2},
+             function (data) {
+                //var filename = data.substring(data.lastIndexOf('\\')+1)
+                var a = document.createElement('a');
+                //var fileurl=  window.URL.createObjectURL(new Blob(data,{type:data.getResponseHeader('Content-Type')}));
+                //a.href =  fileurl;
+                //a.download = 'test'; // Set the file name.
+                //a.style.display = 'none';
+                //document.body.appendChild(a);
+                //a.click();
+                //delete a;
+                //window.URL.revokeObjectURL(fileurl);
+         });
+     });
+*/
+</script>
+</html>
