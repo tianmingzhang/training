@@ -42,14 +42,11 @@
         <label class="textbox-label" style="width: 80%">附件:选择文件后请马上上传，【新建】/【更新】不能保存文件</label>
             <input type="hidden"  id="item_num" value="{{ entries|count }}">
             <ul id="attach">
-                {% set i = cycler(range(entries|count - 1)) %}
                 {% for entry in entries%}
-                    <li id="li_{{i}}"><label style="width:50%" id="item_{{i}}">{{ entry.filenme }}</label><a href="javascript:void(0)" class="easyui-linkbutton"  id="del_{{i}}" style="width:40px">del</a><a href="{{ url_for(todo.download_file,{fileid:entry.fileid}) }}" class="easyui-linkbutton"  id="download_{{i}}" style="width:70px">download</a><input type="hidden"  id="fileid{{i}}" value="{{ entry.fileid }}"><input type="hidden"  id="fieldname{{i}}" value="{{ entry.fieldname }}"></li>
-                {% else %}
+                    <li id="li_{{loop.index}}"><label style="width:50%" id="item_{{loop.index}}">{{ entry.filename }}</label><a href="javascript:void(0)" class="easyui-linkbutton"  id="del_{{loop.index}}" style="width:40px">del</a><a href="{{ url_for('.download_file',fileid=entry.fileid) }}" class="easyui-linkbutton"  id="download_{{loop.index}}" style="width:70px">download</a><input type="hidden"  id="fileid{{loop.index}}" value="{{ entry.fileid }}"><input type="hidden"  id="fieldname{{loop.index}}" value="{{ entry.fieldname }}"></li>
+                {% endfor %}
                  <li><input id="addfile"
                             class="easyui-filebox" style="width:85%" buttonText="选择"><a id="addfilebutton" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" style="width:40px">追加</a>
-                {% endfor %}
-
             </ul>
         </div>
         <div style="margin-bottom:20px">
@@ -230,6 +227,14 @@
                     }
                     else if (data.result["mode"] == 0) {
                         //新规上传正常
+                        $("#message").append("<p class=\"info\" style=\"font:50px;color:mediumorchid\">上传正常</p>");
+                        //清空选择的文件
+                        $("#addfile").filebox("clear");
+                        //增加删除按钮
+                        $("#attach").prepend("<li id=\"li_" + num + "\"><label style=\"width:50%\" id=\"item_" + num + "\">" + data.result["filename"] + "</label><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"></li>");
+                        //渲染增加部分的样式
+                        var a = "#del_" + num;
+                        $.parser.parse($(a).parent());
                     }
                  }else if (data.result["result"]== 1) {
                     //上传异常
@@ -248,18 +253,13 @@
         var action_f = '{{ url_for('todo.del_file',fileid='fileid1') }}'.replace('fileid1',fileid2);
         //var form = $(this).closest('form');
         //form.attr('action',action_f).trigger('submit');
-        $.get($SCRIPT_ROOT + '/todo/_del_file', {fileid: fileid2, item_id:$('#item_id').val(),fieldname:fieldname},
+        $.get($SCRIPT_ROOT + '/todo/_del_file/'+fileid2, { item_id:$('#item_id').val(),fieldname:fieldname},
              function (data) {
                  if (data.result["result"] == 0) {
-                    if (data.result["mode"] == 1) {
                         //更新删除正常
                         $("#message").append("<p class=\"info\" style=\"font:50px;color:mediumorchid\">删除成功</p>");
                         //删除结点
                         $("li").detach("[id='"+ li_num+"']");
-                    }
-                    else if (data.result["mode"] == 0) {
-                        //新规删除正常
-                    }
                  }else if (data.result["result"]== 1) {
                     //删除异常
                     $("#message").append("<p class=\"info\" tyle=\"font:50px;color:red\">删除失败，请再次删除！</p>")
