@@ -1,0 +1,15 @@
+/* common css*/
+input.easyui-datebox{
+    width: 260px;
+}
+
+.cs-myform-ul {
+    border-top: 1px dotted #CDCDCD;
+    list-style: none;
+}
+.cs-myform-ul li a{
+    float: right;
+}
+.easyui-validatebox {
+    background: #CCE6FF;
+}

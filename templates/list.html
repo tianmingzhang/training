@@ -12,14 +12,11 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/bootstrap/easyui.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/icon.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mobile.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mycss.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='myphone.css')}}">
     <script type="text/javascript">
          $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
     </script>
     <style type="text/css">
-        .datalist {
-            background-color: #00CED1;
-        }
     </style>
 </head>
 <body>
@@ -48,29 +45,52 @@
         </div>
 
         <div title="指定日期或状态查看" id="searcheara">
-
-           <input id="startday" name="startday_name" class="easyui-datebox" prompt="请输入开始日" data-options="editable:false" style="width: 35%" value="{{ '%s'% request.form['startday_name'] if "startday_name" in request.form else session['startday_Session']}}"> - <input id="endday" name="endday_name" class="easyui-datebox" prompt="请输入结束日" data-options="editable:false,validType:'equaldDate[\'#startday\']'" style="width: 35%" value="{{ '%s'% request.form['endday_name'] if "endday_name" in request.form else session['endday_Session'] }}">
-            {% if statechecked == "false" %}
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 20%;" >
-            {% elif  statechecked == "true"  %}
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 20%;" checked=true>
-            {% endif %}
-            <input id="titleinput" class="easyui-textbox" name="titleinput_name"  prompt="请输入标题" style="width:60%"  value="{{ '%s'% request.form['titleinput_name'] if "titleinput_name" in request.form else session['titleinput_name_session']}}"/>
-            <br>
-            <div style="text-align: right"><a id="linksubmitd" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true">查询</a></div>
-            <input type="hidden" name="sw1_name_hidden" id="sw1_hidden" value="{{ sw1_name_hidden_value }}">
+            <table>
+               <colgroup>
+					<col span="1" style="width: 8.0em;">
+					<col>
+               </colgroup>
+               <tbody>
+                <tr>
+                    <th><span >预定完了日:</span></th>
+                    <td><input id="startday" name="startday_name" class="easyui-datebox" prompt="开始日" data-options="editable:false"  value="{{ '%s'% request.form['startday_name'] if "startday_name" in request.form else session['startday_Session']}}"> -- <input id="endday" name="endday_name" class="easyui-datebox" prompt="结束日" data-options="editable:false,validType:'equaldDate[\'#startday\']'"  value="{{ '%s'% request.form['endday_name'] if "endday_name" in request.form else session['endday_Session'] }}"></td>
+                </tr>
+                <tr>
+                    <th><span >完了是否:</span></th>
+                    <td>
+                        {% if statechecked == "false" %}
+                             <input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续'" style="width:auto" >
+                        {% elif  statechecked == "true"  %}
+                            <input id="sw1" name="sw1_name" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续'" style="width: auto" checked=true>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th><span>标题:</span></th>
+                    <td><input id="titleinput" class="easyui-textbox" name="titleinput_name"  prompt="请输入需要查询的标题内容" style="width:auto"  value="{{ '%s'% request.form['titleinput_name'] if "titleinput_name" in request.form else session['titleinput_name_session']}}"/></td>
+                </tr>
+                <input type="hidden" name="sw1_name_hidden" id="sw1_hidden" value="{{ sw1_name_hidden_value }}">
+               </tbody>
+            </table>
+            <div>
+                <ul class="cs-myform-ul">
+                    <li>
+                        <a id="linksubmitd" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true">查询</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-
     </div>
 </div>
 <div class="easyui-navpanel">
-    <div style="text-align: right">
+    <p style="text-align: right">
+       <span>权限:</span>
         {% if statechecked2 == "false" %}
-            <input id="sw2" name="sw2_name" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 20%">
+            <input id="sw2" name="sw2_name" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'" style="width:80px" >
         {% elif  statechecked2 == "true"  %}
-            <input id="sw2" name="sw2_name" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 20%" checked>
+            <input id="sw2" name="sw2_name" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'" style="width:80px" checked>
         {% endif %}
-    </div>
+    </p>
     <input type="hidden" name="sw2_name_hidden" id="sw2_hidden" value="{{ sw2_name_hidden_value }}" >
     <div id="dl" data-options="
 				fit: false,
@@ -83,6 +103,7 @@
 <script>
 
     $(function () {
+        $.ajaxSetup({cache:false});
         var sw1_setvalue = $('#sw1').switchbutton("options").checked;
         var sw2_setvalue = $('#sw2').switchbutton("options").checked;
         //console.log("{{ session['startday_Session'] }}")

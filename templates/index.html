@@ -11,8 +11,7 @@
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui-1.5.5/locale/easyui-lang-zh_CN.js')}}"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/bootstrap/easyui.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/icon.css')}}">
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui-1.5.5/themes/mycss.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='mypc.css')}}">
     <script type="text/javascript">
         var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
     </script>
@@ -32,58 +31,94 @@
  </div>
     <form id="todoff" action="{{ url_for('todo.content_update') }} " method="post">
         <div style="margin-bottom:20px">
-            <input id="title" class="easyui-textbox" name="title_index" label="标题:" labelPosition="top" prompt="标题" style="width:100%;height:52px"  value="{{ '%s'% request.form['title_index'] if "title_index" in request.form else session['title_index']}}" required/>
+            <input id="title" class="easyui-validatebox" name="title_index" label="标题:" labelPosition="top" prompt="标题" style="width:100%;height:52px"  value="{{ '%s'% request.form['title_index'] if "title_index" in request.form else session['title_index']}}" data-options="required:true"/>
         </div>
         <div style="margin-bottom:20px">
             <input id="content" class="easyui-textbox" name="content_index" data-options="multiline:true" labelPosition="top" label="内容:" prompt="请输入内容" value="{{ '%s'% request.form['content_index'] if "content_index" in request.form else session['content_index']}}"
                    style="width:100%;height:104px" required>
         </div>
-        <div style="margin-bottom:20px">
-        <label class="textbox-label" style="width: 80%">附件:选择文件后请马上上传，【新建】/【更新】不能保存文件</label>
+        <div style="margin-bottom:20px" id="newfilelist">
+            <h2 class="textbox-label" style="width: 95%">注意:【新建】的场合，选择的附件需要点击【新建】才能保存文件</h2>
             <input type="hidden"  id="item_num" value="{{ entries|count }}">
             <ul id="attach">
                 {% for entry in entries%}
-                    <li id="li_{{loop.index}}"><label style="width:50%" id="item_{{loop.index}}">{{ entry.filename }}</label><a href="javascript:void(0)" class="easyui-linkbutton"  id="del_{{loop.index}}" style="width:40px">del</a><a href="{{ url_for('.download_file',fileid=entry.fileid) }}" class="easyui-linkbutton"  id="download_{{loop.index}}" style="width:70px">download</a><input type="hidden"  id="fileid{{loop.index}}" value="{{ entry.fileid }}"><input type="hidden"  id="fieldname{{loop.index}}" value="{{ entry.fieldname }}"></li>
+                    <li id="li_{{loop.index}}"><label style="width:50%;height: 30px" id="item_{{loop.index}}">{{ entry.filename }}</label><span class="cs-myform-span"><a href="javascript:void(0)" class="easyui-linkbutton"  id="del_{{loop.index}}" style="width:40px">del</a><a href="{{ url_for('.download_file',fileid=entry.fileid) }}" class="easyui-linkbutton"  id="download_{{loop.index}}" style="width:70px">download</a><input type="hidden"  id="fileid{{loop.index}}" value="{{ entry.fileid }}"><input type="hidden"  id="fieldname{{loop.index}}" value="{{ entry.fieldname }}"></span></li>
                 {% endfor %}
                  <li><input id="addfile"
                             class="easyui-filebox" style="width:85%" buttonText="选择"><a id="addfilebutton" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" style="width:40px">追加</a>
+                 </li>
             </ul>
         </div>
         <div style="margin-bottom:20px">
-          <label class="textbox-label" style="width: 15%">权限:</label>
-            {% if authchecked == "false" %}
-                <input id="sw3" class="easyui-switchbutton"  data-options="onText:'凭密可见',offText:'对外公开'" style="width: 30%">
-            {% elif  authchecked == "true"  %}
-                <input id="sw3" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: 30%" checked>
-            {% endif %}
-          <label class="textbox-label" style="width: 15%">完了:</label>
-            {% if finishchecked == "false" %}
-                <input id="sw4" class="easyui-switchbutton"   data-options="onText:'完了',offText:'继续中'" style="width: 30%">
-            {% elif  finishchecked == "true"  %}
-                <input id="sw4" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: 30%" checked>
-            {% endif %}
+          <table>
+              <colgroup>
+                  <col span="1" style="width: 15em;">
+                  <col>
+                  <col span="1" style="width: 15em;">
+                  <col>
+              </colgroup>
+              <tbody>
+                <tr>
+                    <th>权限:</th>
+                    <td>
+                        {% if authchecked == "false" %}
+                            <input id="sw3" class="easyui-switchbutton"  data-options="onText:'凭密可见',offText:'对外公开'" style="width: auto">
+                        {% elif  authchecked == "true"  %}
+                            <input id="sw3" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: auto" checked>
+                        {% endif %}
+                    </td>
+                    <th>完了:</th>
+                    <td>
+                        {% if finishchecked == "false" %}
+                            <input id="sw4" class="easyui-switchbutton"   data-options="onText:'完了',offText:'继续中'" style="width: auto">
+                        {% elif  finishchecked == "true"  %}
+                            <input id="sw4" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: auto" checked>
+                        {% endif %}
+                    </td>
+                </tr>
+                    <input type="hidden" name="sw3_name_hidden" id="sw3_hidden" value="{{ sw3_name_hidden_value }}" >
+                <tr>
+                    <th>预定期限:</th>
+                    <td>
+                        <input id="scheduleday" name="scheduleday_name" class="easyui-datebox" prompt="请输入预定期限"  data-options="selectOnNavigation:false,novalidate:true" value="{{ '%s'% request.form['scheduleday_name'] if "scheduleday_name" in request.form else session['scheduleday_name']  }}" >
+                    </td>
+                    <th>必须期限:</th>
+                    <td>
+                        <input id="mustday" class="easyui-datebox" name="mustday_name" prompt="请输入必须期限" value="{{ '%s'% request.form['mustday_name'] if "mustday_name" in request.form else session['mustday_name']  }}" >
+                    </td>
+                </tr>
+                    <input type="hidden" name="sw4_name_hidden" id="sw4_hidden" value="{{ sw4_name_hidden_value }}" >
+                <tr>
+                    <th>创建日:</th>
+                    <td>
+                        <input id="creatday" name="create_date_index" class="easyui-datebox" data-options="editable:false" value="{{ '%s'% request.form['create_date_index'] if "create_date_index" in request.form else session['create_date_index']  }}">
+                    </td>
+                </tr>
+              </tbody>
+          </table>
         </div>
-        <input type="hidden" name="sw3_name_hidden" id="sw3_hidden" value="{{ sw3_name_hidden_value }}" >
-        <div style="margin-bottom:20px">
-            <label class="textbox-label" style="width: 15%">预定期限:</label><input id="scheduleday" name="scheduleday_name" class="easyui-datebox" prompt="请输入预定期限"  data-options="selectOnNavigation:false,novalidate:true" value="{{ '%s'% request.form['scheduleday_name'] if "scheduleday_name" in request.form else session['scheduleday_name']  }}" style="width: 30%">
-            <label class="textbox-label" style="width: 15%">必须期限:</label><input id="mustday" class="easyui-datebox" name="mustday_name" prompt="请输入必须期限" value="{{ '%s'% request.form['mustday_name'] if "mustday_name" in request.form else session['mustday_name']  }}" style="width: 30%">
-        </div>
-        <input type="hidden" name="sw4_name_hidden" id="sw4_hidden" value="{{ sw4_name_hidden_value }}" >
-        <div style="margin-bottom:20px">
-            <label class="textbox-label"style="width: 15%" >创建日:</label><input id="creatday" name="create_date_index" class="easyui-datebox" style="width: 30%"data-options="editable:false" value="{{ '%s'% request.form['create_date_index'] if "create_date_index" in request.form else session['create_date_index']  }}">
-        </div>
-    <input type="hidden" name="buttonflag_name" id="buttonflag" value="{{ buttonflag }}" >
-    <input type="hidden" name="item_id_name" id="item_id" value="{{ item_id }}" >
+        <input type="hidden" name="buttonflag_name" id="buttonflag" value="{{ buttonflag }}" >
+        <input type="hidden" name="item_id_name" id="item_id" value="{{ item_id }}" >
     </form>
     <div>
-        {% if buttonflag == "false" %}
-            <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" iconCls="icon-ok"
-                   onclick="$('#todoff').submit()" style="width:60px" data-option="buttonAlign:'right'">新建</a>
-        {% elif  buttonflag == "true"  %}
-            <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" iconCls="icon-ok"
-                   onclick="$('#todoff').submit()" style="width:60px" data-options="buttonAlign:'right'">更新</a>
-        {% endif %}
-            <a href="{{ url_for('todo.back_list') }}"class="easyui-linkbutton back" plain="true" outline="true" style="width:60px;alignment: right">返回</a>
+        <ul class="cs-myform-ul">
+            <li>
+                {% if buttonflag == "false" %}
+                    <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" iconCls="icon-ok"
+                        onclick="$('#todoff').submit()" style="width:60px" data-option="buttonAlign:'right'">新建
+                    </a>
+                {% elif  buttonflag == "true"  %}
+                    <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" iconCls="icon-ok"
+                        onclick="$('#todoff').submit()" style="width:60px" data-options="buttonAlign:'right'">更新
+                    </a>
+                {% endif %}
+            </li>
+        </ul>
+        <ul class="cs-myform-ul">
+            <li>
+                <a href="{{ url_for('todo.back_list') }}"class="easyui-linkbutton back" plain="true" outline="true" style="width:60px;alignment: right">返回</a>
+            </li>
+        </ul>
     </div>
 
 </div>
@@ -138,6 +173,15 @@
     $.fn.datebox.methods.initValue  = function(jq, _bfc) {
        //jq.preventDefault();
     }
+    $.extend($.fn.validatebox.defaults.rules, {
+      minLength: {
+        validator: function(value, param){
+            return value.length >= param[0];
+        },
+        message: 'Please enter at least {0} characters.'
+      }
+     });
+
     $(function () {
         //标题，内容-带清除标记文本框
         $('#title').textbox().textbox('addClearBtn', 'icon-clear');
@@ -220,7 +264,7 @@
                         //清空选择的文件
                         $("#addfile").filebox("clear");
                         //增加删除按钮
-                        $("#attach").prepend("<li id=\"li_" + num + "\"><label style=\"width:50%\" id=\"item_" + num + "\">" + data.result["filename"] + "</label><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"><input type=\"hidden\"  id=\"fieldname" + num + "\" value=\"" + data.result["fieldname"] + "\"></li>");
+                        $("#attach").prepend("<li id=\"li_" + num + "\"><label style=\"width:50%\" id=\"item_" + num + "\">" + data.result["filename"] + "</label><span class=\"cs-myform-span\"><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"><input type=\"hidden\"  id=\"fieldname" + num + "\" value=\"" + data.result["fieldname"] + "\"></span></li>");
                         //渲染增加部分的样式
                         var a = "#del_" + num;
                         $.parser.parse($(a).parent());
@@ -231,7 +275,7 @@
                         //清空选择的文件
                         $("#addfile").filebox("clear");
                         //增加删除按钮
-                        $("#attach").prepend("<li id=\"li_" + num + "\"><label style=\"width:50%\" id=\"item_" + num + "\">" + data.result["filename"] + "</label><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"></li>");
+                        $("#attach").prepend("<li id=\"li_" + num + "\"><label style=\"width:50%\" id=\"item_" + num + "\">" + data.result["filename"] + "</label><span class=\"cs-myform-span\"><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"><input type=\"hidden\"  name=\"fieldnamecombox\" value=\"" + data.result["fileid"]+"/"+data.result["filename"] + "\"></span></li>");
                         //渲染增加部分的样式
                         var a = "#del_" + num;
                         $.parser.parse($(a).parent());

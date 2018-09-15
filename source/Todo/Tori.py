@@ -1,4 +1,4 @@
-from flask import Flask,session
+from flask import Flask,session,redirect,url_for
 from flask import render_template
 from datetime import datetime,timedelta,timezone
 from flask_pymongo import PyMongo
@@ -146,15 +146,18 @@ def get_defaluttodolist():
 
     return jsonify(result=templist)
 
-@todo.route('/',methods=['GET','POST'])
-def init_page():
-    #初始值保存在session中
-    session['startday_Session'] = ''
-    session['endday_Session'] = ''
-    session['titleinput_name_session'] = ''
-    session['sw1_Session'] = 'false'
-    session['sw2_Session'] = 'false'
-    return render_template('list.html')
+@todo.route('/',defaults={'error':[]}, methods=['GET','POST'])
+@todo.route('/<error>',methods=['GET','POST'])
+def init_page(error):
+    flag = request.args.get('flag')
+    if flag != '1' :
+        #初始值保存在session中
+        session['startday_Session'] = ''
+        session['endday_Session'] = ''
+        session['titleinput_name_session'] = ''
+        session['sw1_Session'] = 'false'
+        session['sw2_Session'] = 'false'
+    return render_template('list.html',error=error)
 
 #取得超出期限外未完成的TODO
 @todo.route('/_get_timeup_todo',methods=['GET','POST'])
@@ -264,7 +267,8 @@ def sw2changed(check_error,internal_check_error):
             session['sw2_Session'] = 'false'
         elif request.form['sw2_name_hidden'] == "True":
             session['sw2_Session'] = 'true'
-    return render_template('list.html', error=error1)
+    #return render_template('list.html', error=error1)
+    return redirect(url_for('.init_page',error=error1,flag=1))
 
 #两个swtichbotton的状态保留
 @todo.context_processor

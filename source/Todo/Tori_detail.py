@@ -1,4 +1,4 @@
-from flask import Flask,session
+from flask import Flask,session,redirect,url_for
 from flask import render_template
 from datetime import datetime,timedelta,timezone
 from flask import jsonify
@@ -113,10 +113,18 @@ def check_date_detail():
             ISOTIMEFORMAT = "%Y-%m-%d"
             from_date = request.form['scheduleday_name']
             to_date= request.form['mustday_name']
-            #from,to是合法性检查
+            title= request.form['title_index']
+            content = request.form['content_index']
+            input_error = False
             check_error = False
             internal_check_error = False
-            if (from_date != '' and to_date !=''):
+            #标题，内容必须入力检查
+            if (str(title).strip() == '' or str(content).strip() == ''):
+                input_error = True
+
+            #from,to是合法性检查
+            if (input_error == False):
+             if (from_date != '' and to_date !=''):
                 try:
                     from_date_1 = datetime.strptime(from_date,ISOTIMEFORMAT)
                     to_date_1 = datetime.strptime(to_date,ISOTIMEFORMAT)
@@ -128,7 +136,7 @@ def check_date_detail():
                 if check_error == False and from_date_1 > to_date_1:
                     internal_check_error = True
 
-            elif (from_date != '' or to_date !=''):
+             elif (from_date != '' or to_date !=''):
                 if from_date != '':
                     try:
                         from_date_1 = datetime.strptime(from_date, ISOTIMEFORMAT)
@@ -143,14 +151,14 @@ def check_date_detail():
 
                 #返回比较结果
 
-            return f(check_error,internal_check_error,*args, **kwargs)
+            return f(input_error,check_error,internal_check_error,*args, **kwargs)
         return decorated_function
     return decorator
 
 #详细画面提交(check->新建/更新/删除）
 @todo.route('/_content_update',methods=['GET','POST'])
 @check_date_detail()
-def content_update(check_error,internal_check_error):
+def content_update(input_error,check_error,internal_check_error):
     mongo1 = getattr(g, 'db', None)
     mongo = mongo1.Tori
     error1 = []
@@ -173,6 +181,12 @@ def content_update(check_error,internal_check_error):
     # button状态保留
     if "buttonflag_name" in request.form:
         buttonflag = request.form['buttonflag_name']
+
+    if input_error == True:
+        error1.append("请检查标题和内容，确保已经填入")
+        return render_template('index.html', error=error1, buttonflag=buttonflag, authchecked=authchecked,
+                               sw3_name_hidden_value=sw3_name_hidden, finishchecked=finishchecked,
+                               sw4_name_hidden_value=sw4_name_hidden)
 
     if check_error == True:
         error1.append("请输入正确格式的日期")
@@ -237,23 +251,19 @@ def content_update(check_error,internal_check_error):
         mongo.todo.update_one({'_id': item_id},{'$set':{'标题':title,'内容':content,'权限':auth,'预定完了日':scheduleday,'必须完了日':mustday,'创建日':creatday,'完了是否':finished,'创建者':'ztm'}},True)
         #新规时附件追加
         if item_id1.strip() == '':
-            file_list = getattr(g, 'file_list', None)
+            file_list = request.form.getlist('fieldnamecombox')
             num = 1
             for row in file_list:
-                for key, value in row.items():
-                    if key == 'fileid':
-                        file_id = value
-                    if key == 'filename':
-                        file_name = value
-                title = '附件' + num
+                filelist = str(row).split('/')
+                file_id = filelist[0]
+                file_name = filelist[1]
+                title = '附件' +  str(num)
                 title_value = {'fileid': file_id, 'filename': file_name}
                 mongo.todo.update_one({'_id': item_id}, {'$push': {title: title_value}}, False)
                 num = num + 1
-            if hasattr(g, "file_list"):
-                g.pop('file_list', None)
 
-        from_index_return_list_value = "true"
-        return render_template('list.html', from_index_return_list_value=from_index_return_list_value)
+        #from_index_return_list_value = "true"
+        return redirect(url_for('todo.back_list'))
 
 #文件上传
 @todo.route('/_add_file',methods=['GET','POST'])
@@ -267,8 +277,13 @@ def add_file():
     #处理结果
     resulta = {}
 
+    #if session.get('file_list') is not None:
+       # file_list = session.get('file_list')
+    #else:
+      #  file_list = []
+
     if item_id1.strip() == '':
-        #新规场合：把文件放入 GridFS里，同时存住file_id，依旧可以删除（从_id list)，下载，但是正式登陆要随新规按钮一起动作
+        #新规场合：把文件放入 GridFS里，删除的时候，删除GridFs里存的文件，正式登陆要随新规按钮一起动作
         mongo1 = getattr(g, 'db', None)
         mongo = mongo1.Tori
         fs = gridfs.GridFS(mongo)
@@ -281,13 +296,12 @@ def add_file():
         resulta['fileid'] = str(fp._id)
 
         #存住file_id
-        file_list = []
-        tempdict = {}
-        tempdict['fileid'] = str(fp._id)
-        tempdict['filename'] = file.filename
-        file_list.append(tempdict)
-        if 'file_list' not in g:
-            g.file_list = file_list
+
+        #tempdict = {}
+        #tempdict['fileid'] = str(fp._id)
+        #tempdict['filename'] = file.filename
+        #file_list.append(tempdict)
+        #session['file_list'] =  file_list
 
     else:
         # 更新：_id直接存入对应的document，删除也直接从document，文件和更新按钮动作分开
@@ -384,19 +398,8 @@ def del_file(fileid):
 
 
 
-    if item_id1.strip() == '':
-      #新规的场合，file_id list里对应记录删除
-      file_list = getattr(g, 'file_list', None)
-      for row in file_list:
-          for key, value in row.items():
-              if key == 'fileid':
-                  file_id = value
-              if file_id == fileid:
-                  file_list.remove(row)
-                  break
-
-    else:
-      # 如果是更新的话，record记录里的file-id删除
+    if item_id1.strip() != '':
+      # 更新的场合，record记录里的file-id删除
       try:
           mongo.todo.update_one({'_id': item_id}, {'$unset': {fieldname: 1}})
       except Exception as e:

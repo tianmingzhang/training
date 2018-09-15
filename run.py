@@ -1,4 +1,4 @@
-from flask import Flask,session
+from flask import Flask
 from flask_session import Session
 from flask_pymongo import PyMongo
 from source.Todo import todo
@@ -10,7 +10,8 @@ import configparser
 #app init
 app = Flask(__name__)
 #get session config
-app.config.from_object(config)
+app.config.from_pyfile('config.py')
+
 Session(app)
 #blueprint register
 app.register_blueprint(todo,url_prefix='/todo')

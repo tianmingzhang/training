@@ -1,0 +1,14 @@
+/* common css*/
+input.easyui-datebox{
+    width: 85px;
+}
+ul li span {
+    float: right;
+}
+.cs-myform-ul {
+    border-top: 1px dotted #CDCDCD;
+    list-style: none;
+}
+.cs-myform-ul li a{
+    float: right;
+}
