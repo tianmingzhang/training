@@ -55,53 +55,53 @@
                 </tbody>
             </table>
         </div>
-        <div style="margin-bottom:20px">
-          <table class="cs-myform-table">
-              <colgroup>
-                  <col span="1" style="width:5em;">
-                  <col>
-                  <col span="1" style="width:5em;">
-                  <col>
-              </colgroup>
-              <tbody>
-                <tr>
-                    <th>权限:</th>
-                    <td>
+        <div id="divide" style="margin-bottom:10px">
+                <div id="left">
+                    <span>权&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;限:</span>
+                    <span>
                         {% if authchecked == "false" %}
                             <input id="sw3" class="easyui-switchbutton"  data-options="onText:'凭密可见',offText:'对外公开'" style="width: auto">
                         {% elif  authchecked == "true"  %}
                             <input id="sw3" class="easyui-switchbutton" data-options="onText:'凭密可见',offText:'对外公开'"  style="width: auto" checked>
                         {% endif %}
-                    </td>
-                    <th>完了:</th>
-                    <td>
+                    </span>
+                </div>
+                <div id ="right">
+                    <span>完&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;了:</span>
+                    <span>
                         {% if finishchecked == "false" %}
                             <input id="sw4" class="easyui-switchbutton"   data-options="onText:'完了',offText:'继续中'" style="width: auto">
                         {% elif  finishchecked == "true"  %}
                             <input id="sw4" class="easyui-switchbutton" data-options="onText:'完了',offText:'继续中'" style="width: auto" checked>
                         {% endif %}
-                    </td>
-                </tr>
+                    </span>
+                </div>
                     <input type="hidden" name="sw3_name_hidden" id="sw3_hidden" value="{{ sw3_name_hidden_value }}" >
-                <tr>
-                    <th>预定期限:</th>
-                    <td>
+        </div>
+        <div id="divide" style="margin-bottom:10px">
+                <div id="left">
+                    <span>预定期限:</span>
+                    <span>
                         <input id="scheduleday" name="scheduleday_name" class="easyui-datebox" prompt="请输入预定期限"  data-options="selectOnNavigation:false,novalidate:true" value="{{ '%s'% request.form['scheduleday_name'] if "scheduleday_name" in request.form else session['scheduleday_name']  }}" >
-                    </td>
-                    <th>必须期限:</th>
-                    <td>
+                    </span>
+                </div>
+                <div id ="right">
+                    <span>必须期限:</span>
+                    <span>
                         <input id="mustday" class="easyui-datebox" name="mustday_name" prompt="请输入必须期限" value="{{ '%s'% request.form['mustday_name'] if "mustday_name" in request.form else session['mustday_name']  }}" >
-                    </td>
-                </tr>
+                    </span>
+                </div>
+        </div>
+        <div id="divide" style="margin-bottom:10px">
                     <input type="hidden" name="sw4_name_hidden" id="sw4_hidden" value="{{ sw4_name_hidden_value }}" >
-                <tr>
-                    <th>创建日:</th>
-                    <td>
+                <div id="left">
+                    <span>创&nbsp;建&nbsp;&nbsp;日:</span>
+                    <span>
                         <input id="creatday" name="create_date_index" class="easyui-datebox" data-options="editable:false" value="{{ '%s'% request.form['create_date_index'] if "create_date_index" in request.form else session['create_date_index']  }}">
-                    </td>
-                </tr>
-              </tbody>
-          </table>
+                    </span>
+                </div>
+            <div id ="right">
+            </div>
         </div>
         <input type="hidden" name="buttonflag_name" id="buttonflag" value="{{ buttonflag }}" >
         <input type="hidden" name="item_id_name" id="item_id" value="{{ item_id }}" >

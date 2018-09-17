@@ -19,10 +19,19 @@ input.easyui-datebox{
 .cs-myform-ul-normal li a{
     margin-left: -40px;
 }
-.cs-myform-table th {
-    background: #CCE6FF;
-}
 #_easyui_textbox_input7.textbox-text,#_easyui_textbox_input9.textbox-text {
     background: #CCE6FF;
 }
 
+#divide{
+    display: flex;
+ }
+#left {
+    flex:1;
+}
+#right {
+    flex:1;
+}
+#divide .textbox-text {
+    background: #CCE6FF;
+}
