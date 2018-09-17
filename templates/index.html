@@ -40,21 +40,27 @@
         <div style="margin-bottom:20px" id="newfilelist">
             <h2 class="textbox-label" style="width: 95%">注意:【新建】的场合，选择的附件需要点击【新建】才能保存文件</h2>
             <input type="hidden"  id="item_num" value="{{ entries|count }}">
-            <ul id="attach">
-                {% for entry in entries%}
-                    <li id="li_{{loop.index}}"><label style="width:50%;height: 30px" id="item_{{loop.index}}">{{ entry.filename }}</label><span class="cs-myform-span"><a href="javascript:void(0)" class="easyui-linkbutton"  id="del_{{loop.index}}" style="width:40px">del</a><a href="{{ url_for('.download_file',fileid=entry.fileid) }}" class="easyui-linkbutton"  id="download_{{loop.index}}" style="width:70px">download</a><input type="hidden"  id="fileid{{loop.index}}" value="{{ entry.fileid }}"><input type="hidden"  id="fieldname{{loop.index}}" value="{{ entry.fieldname }}"></span></li>
-                {% endfor %}
-                 <li><input id="addfile"
-                            class="easyui-filebox" style="width:85%" buttonText="选择"><a id="addfilebutton" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" style="width:40px">追加</a>
-                 </li>
-            </ul>
+            <table >
+                <colgroup>
+					    <col span="1" style="width: 70.0em;">
+					    <col>
+                </colgroup>
+                <tbody id="attach">
+                    {% for entry in entries%}
+                        <tr id="li_{{loop.index}}"><th  id="item_{{loop.index}}">{{ entry.filename }}</th><td><a href="javascript:void(0)" class="easyui-linkbutton"  id="del_{{loop.index}}" style="width:40px">del</a><input type="hidden"  id="fileid{{loop.index}}" value="{{ entry.fileid }}"><input type="hidden"  id="fieldname{{loop.index}}" value="{{ entry.fieldname }}"></td><td><a href="{{ url_for('.download_file',fileid=entry.fileid) }}" class="easyui-linkbutton"  id="download_{{loop.index}}" style="width:70px">download</a></td></tr>
+                    {% endfor %}
+                    <tr><th><input id="addfile"
+                            class="easyui-filebox" style="width:85%" buttonText="选择"><a id="addfilebutton" href="javascript:void(0)" class="easyui-linkbutton" plain="true" outline="true" style="width:40px">追加</a></th>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div style="margin-bottom:20px">
-          <table>
+          <table class="cs-myform-table">
               <colgroup>
-                  <col span="1" style="width: 15em;">
+                  <col span="1" style="width:5em;">
                   <col>
-                  <col span="1" style="width: 15em;">
+                  <col span="1" style="width:5em;">
                   <col>
               </colgroup>
               <tbody>
@@ -114,7 +120,7 @@
                 {% endif %}
             </li>
         </ul>
-        <ul class="cs-myform-ul">
+        <ul class="cs-myform-ul-normal">
             <li>
                 <a href="{{ url_for('todo.back_list') }}"class="easyui-linkbutton back" plain="true" outline="true" style="width:60px;alignment: right">返回</a>
             </li>
@@ -264,9 +270,9 @@
                         //清空选择的文件
                         $("#addfile").filebox("clear");
                         //增加删除按钮
-                        $("#attach").prepend("<li id=\"li_" + num + "\"><label style=\"width:50%\" id=\"item_" + num + "\">" + data.result["filename"] + "</label><span class=\"cs-myform-span\"><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"><input type=\"hidden\"  id=\"fieldname" + num + "\" value=\"" + data.result["fieldname"] + "\"></span></li>");
+                        $("#attach").prepend("<tr id=\"li_" + num + "\"><th id=\"item_" + num + "\">" + data.result["filename"] + "</th><td><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"><input type=\"hidden\"  id=\"fieldname" + num + "\" value=\"" + data.result["fieldname"] + "\"></td><td><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a></td></tr>");
                         //渲染增加部分的样式
-                        var a = "#del_" + num;
+                        var a = "#li_" + num;
                         $.parser.parse($(a).parent());
                     }
                     else if (data.result["mode"] == 0) {
@@ -275,9 +281,9 @@
                         //清空选择的文件
                         $("#addfile").filebox("clear");
                         //增加删除按钮
-                        $("#attach").prepend("<li id=\"li_" + num + "\"><label style=\"width:50%\" id=\"item_" + num + "\">" + data.result["filename"] + "</label><span class=\"cs-myform-span\"><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"><input type=\"hidden\"  name=\"fieldnamecombox\" value=\"" + data.result["fileid"]+"/"+data.result["filename"] + "\"></span></li>");
+                        $("#attach").prepend("<tr id=\"li_" + num + "\"><th id=\"item_" + num + "\">" + data.result["filename"] + "</th><td><a href=\"javascript:void(0)\" class=\"easyui-linkbutton\"  style=\"width:40px\" id=\"del_" + num + "\">del</a><input type=\"hidden\"  id=\"fileid" + num + "\" value=\"" + data.result["fileid"] + "\"><input type=\"hidden\"  name=\"fieldnamecombox\" value=\"" + data.result["fileid"]+"/"+data.result["filename"] + "\"></td><td><a href=\"/todo/_download_file/" + data.result["fileid"] + "\" class=\"easyui-linkbutton\" style=\"width:70px\" id=\"download_" + num + "\">download</a></td></tr>");
                         //渲染增加部分的样式
-                        var a = "#del_" + num;
+                        var a = "#li_" + num;
                         $.parser.parse($(a).parent());
                     }
                  }else if (data.result["result"]== 1) {
@@ -288,7 +294,7 @@
          });
      });
      //文件删除
-    $("#attach").on("click","li>a[id^='del_']",function(){
+    $("#attach").on("click","td>a[id^='del_']",function(){
         //清除msg领域信息
         $("#message").empty();
         var fileid2 = $(this).nextAll().filter("input[id^='fileid']").val();
@@ -303,7 +309,7 @@
                         //更新删除正常
                         $("#message").append("<p class=\"info\" style=\"font:50px;color:mediumorchid\">删除成功</p>");
                         //删除结点
-                        $("li").detach("[id='"+ li_num+"']");
+                        $("tr").detach("[id='"+ li_num+"']");
                  }else if (data.result["result"]== 1) {
                     //删除异常
                     $("#message").append("<p class=\"info\" tyle=\"font:50px;color:red\">删除失败，请再次删除！</p>")

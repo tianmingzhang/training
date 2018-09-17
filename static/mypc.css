@@ -6,10 +6,23 @@ input.easyui-datebox{
 .cs-myform-ul {
     border-top: 1px dotted #CDCDCD;
     list-style: none;
+    clear: none;
 }
 .cs-myform-ul li a{
     float: right;
+    margin-top: 10px;
 }
-.easyui-validatebox {
+.cs-myform-ul-normal {
+    list-style: none;
+    clear: none;
+}
+.cs-myform-ul-normal li a{
+    margin-left: -40px;
+}
+.cs-myform-table th {
     background: #CCE6FF;
 }
+#_easyui_textbox_input7.textbox-text,#_easyui_textbox_input9.textbox-text {
+    background: #CCE6FF;
+}
+
